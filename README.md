@@ -34,14 +34,9 @@ Kết quả cần có một dòng với `role = admin`. Quản lý mật khẩu 
 
 ## Khôi phục mật khẩu
 
-Trước khi bật chức năng khôi phục trên website thật, đặt **Authentication → URL Configuration → Site URL** thành URL HTTPS chính thức của website. Trong **Authentication → Emails → Reset Password**, cấu hình liên kết như sau (giữ các biến mẫu của Supabase nguyên vẹn):
+Trước khi bật chức năng khôi phục trên website thật, đặt **Authentication → URL Configuration → Site URL** thành URL HTTPS chính thức của website và thêm URL chính xác `<URL website>/auth/confirm` vào **Redirect URLs**. Mẫu email mặc định của Supabase được giữ nguyên, không yêu cầu SMTP tùy chỉnh.
 
-```html
-<p>Nhấn vào liên kết sau để đặt mật khẩu mới:</p>
-<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery">Đặt lại mật khẩu</a></p>
-```
-
-Sau đó kiểm tra thực tế bằng tài khoản do chủ sở hữu kiểm soát: yêu cầu thư từ `/quen-mat-khau`, mở liên kết trong thư, tự đặt mật khẩu tại `/dat-lai-mat-khau`, rồi đăng nhập và thử `/settings`. Không gửi mật khẩu, mã khôi phục hoặc khóa bí mật qua chat hay lưu vào kho mã. Chỉ trang nhận token loại `recovery`; token hết hạn hoặc sai dẫn về form yêu cầu lại.
+Sau đó kiểm tra thực tế bằng tài khoản do chủ sở hữu kiểm soát: yêu cầu thư từ `/quen-mat-khau`, mở liên kết trong thư **bằng cùng trình duyệt đã gửi yêu cầu**, tự đặt mật khẩu tại `/dat-lai-mat-khau`, rồi đăng nhập và thử `/settings`. Luồng PKCE lưu mã xác minh trong trình duyệt ban đầu; mở liên kết ở trình duyệt hoặc thiết bị khác sẽ không hoàn tất được. Không gửi mật khẩu, mã khôi phục hoặc khóa bí mật qua chat hay lưu vào kho mã. Mã hết hạn, sai hoặc không thuộc luồng khôi phục dẫn về form yêu cầu lại.
 
 ## Chạy tại máy
 
