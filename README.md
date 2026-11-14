@@ -32,6 +32,17 @@ Kết quả cần có một dòng với `role = admin`. Quản lý mật khẩu 
 
 4. Kiểm tra Database → Publications → `supabase_realtime` có `public.platform_settings`, và Realtime được bật. Schema tự thêm bảng khi publication đã tồn tại.
 
+## Khôi phục mật khẩu
+
+Trước khi bật chức năng khôi phục trên website thật, đặt **Authentication → URL Configuration → Site URL** thành URL HTTPS chính thức của website. Trong **Authentication → Emails → Reset Password**, cấu hình liên kết như sau (giữ các biến mẫu của Supabase nguyên vẹn):
+
+```html
+<p>Nhấn vào liên kết sau để đặt mật khẩu mới:</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery">Đặt lại mật khẩu</a></p>
+```
+
+Sau đó kiểm tra thực tế bằng tài khoản do chủ sở hữu kiểm soát: yêu cầu thư từ `/quen-mat-khau`, mở liên kết trong thư, tự đặt mật khẩu tại `/dat-lai-mat-khau`, rồi đăng nhập và thử `/settings`. Không gửi mật khẩu, mã khôi phục hoặc khóa bí mật qua chat hay lưu vào kho mã. Chỉ trang nhận token loại `recovery`; token hết hạn hoặc sai dẫn về form yêu cầu lại.
+
 ## Chạy tại máy
 
 ```bash
@@ -42,6 +53,8 @@ npm run dev
 ```
 
 Mở `http://localhost:3000/settings`, đăng nhập bằng tài khoản Founder đã tạo, đổi thông tin và nhấn Lưu. Mở trang chủ trong một thẻ khác để kiểm tra Realtime. Nếu không kết nối database hoặc chưa có cấu hình, ứng dụng sẽ báo lỗi thay vì dựng dữ liệu giả.
+
+Khi triển khai Sites, cần cung cấp cả hai biến `NEXT_PUBLIC_SUPABASE_*` cho quá trình build và cấu hình runtime của Site; sau khi thay đổi, hãy build và triển khai lại. Chỉ dùng publishable/anon key công khai, không dùng service-role key.
 
 Kiểm tra: `npm run typecheck`, `npm run test:rls`, `npm run build`. Test RLS chạy PostgreSQL PGlite cục bộ với Auth fixture; vẫn cần kiểm thử với dự án Supabase thực và trình duyệt thực.
 
