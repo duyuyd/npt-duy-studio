@@ -43,7 +43,7 @@ try {
   await db.query("insert into public.api_keys(project_id,key_hash) values ($1,repeat('a',64))", [projectA]);
 
   await as("anon");
-  assert.equal((await db.query("select * from public.platform_settings")).rows.length, 3);
+  assert.equal((await db.query("select * from public.platform_settings")).rows.length, 4);
   await denied("select * from public.projects");
 
   await as("authenticated", alice);

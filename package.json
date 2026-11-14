@@ -7,12 +7,17 @@
     "build": "next build && opennextjs-cloudflare build --skipNextBuild && node scripts/build-for-sites.mjs",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:rls": "node tests/rls.mjs"
+    "test:rls": "node tests/rls.mjs",
+    "test:builder": "node tests/builder-rls.mjs && esbuild tests/builder.test.ts --bundle --platform=node --format=esm --outfile=.next/builder-test.mjs && node .next/builder-test.mjs"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.119.0",
+    "aws4fetch": "^1.0.20",
+    "fflate": "^0.8.3",
     "framer-motion": "14.14.0",
+    "lucide-react": "^1.73.0",
     "next": "15.5.29",
     "react": "19.2.9",
     "react-dom": "19.2.9"
@@ -29,6 +34,7 @@
     "@types/node": "22.19.11",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "esbuild": "^0.28.2",
     "postcss": "8.5.33",
     "tailwindcss": "4.3.5",
     "typescript": "5.9.3",

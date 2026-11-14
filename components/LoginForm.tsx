@@ -1,23 +1,9 @@
 "use client";
-
-import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-
+import Link from "next/link";
+import { useActionState } from "react";
+import { signIn, type AuthState } from "@/app/auth/actions";
+const initial: AuthState = { error: "", message: "" };
 export function LoginForm() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setBusy(true); setError("");
-    try {
-      const { error: authError } = await createClient().auth.signInWithPassword({ email: email.trim(), password });
-      if (authError) { setError("Không thể đăng nhập. Kiểm tra email và mật khẩu của bạn."); return; }
-      router.replace("/settings"); router.refresh();
-    } catch { setError("Không kết nối được. Vui lòng thử lại."); }
-    finally { setBusy(false); }
-  }
-  return <form onSubmit={submit} className="form-stack mt-8"><label className="field-label">Email<input className="field-input" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label><label className="field-label">Mật khẩu<input className="field-input" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>{error && <p role="alert" className="form-error">{error}</p>}<button className="primary-button justify-center" type="submit" disabled={busy}>{busy ? "Đang đăng nhập…" : "Đăng nhập"}</button></form>;
+  const [state, action, pending] = useActionState(signIn, initial);
+  return <form action={action} className="form-stack mt-8"><label className="field-label">Email<input className="field-input" name="email" type="email" autoComplete="email" required /></label><label className="field-label">Mật khẩu<input className="field-input" name="password" type="password" autoComplete="current-password" required /></label>{state.error && <p role="alert" className="form-error">{state.error}</p>}<button className="primary-button justify-center" type="submit" disabled={pending}>{pending ? "Đang đăng nhập…" : "Đăng nhập"}</button><Link className="back-link" href="/quen-mat-khau">Quên hoặc chưa có mật khẩu?</Link><Link className="back-link" href="/dang-ky">Tạo tài khoản mới</Link></form>;
 }

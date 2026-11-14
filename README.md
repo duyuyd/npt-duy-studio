@@ -1,53 +1,42 @@
-# NPT Duy Studio — Phase 1
+# NPT Duy Studio
 
-Nền tảng no-code mới cho Founder NPT Duy, tách biệt với Góc Hợp Âm. Phạm vi hiện tại: schema Supabase, RLS, Supabase Auth và giao diện Founder đổi màu, tiêu đề, cờ cấu hình. Trình kéo thả, export, thanh toán và EAS **chưa được triển khai**.
+Nền tảng tạo website và ứng dụng của NPT Duy. Dự án dùng Next.js 15, React 19, Supabase, Tailwind 4 và @dnd-kit; tách biệt với Góc Hợp Âm.
 
-## Thành phần
+## Chức năng trong mã
 
-- Next.js 15 App Router, React 19, TypeScript strict, Tailwind CSS 4, Framer Motion.
-- PostgreSQL/Supabase: `platform_settings`, `profiles`, `projects`, `pages`, `api_keys`.
-- `/settings` là trang Founder; `/admin/settings` chuyển hướng về `/settings`.
-- Cấu hình thực được tải vào layout; Server Action kiểm tra Founder rồi lưu qua RPC. React Context và CSS variables cập nhật ngay ở phiên đang mở; các phiên khác nhận thay đổi qua Supabase Realtime khi dịch vụ hoạt động.
-- `api_keys` hiện chỉ là schema và RLS. Chưa có cấp phát, xác minh hoặc thu hồi khóa. Client chỉ xem được metadata, không được đọc hash hoặc tự tạo khóa.
+- Đăng ký, đăng nhập và khôi phục mật khẩu qua Supabase Auth; chủ tài khoản tự đặt mật khẩu.
+- Founder đổi màu chủ đạo, tiêu đề và mô tả trang chủ; dữ liệu lưu trong `platform_settings`. Cập nhật được áp dụng ngay ở phiên hiện tại và các phiên khác khi Realtime hoạt động.
+- Tạo dự án thật; kéo, thả và lồng khối văn bản, nút, ảnh, khung chứa. Có hoàn tác, làm lại, thu phóng, tự lưu sau 2 giây và kiểm tra phiên bản để tránh ghi đè thay đổi từ phiên khác.
+- Xuất mã nguồn React Web hoặc Expo/React Native thành ZIP từ cấu trúc đã lưu.
+- Hàng đợi `build_jobs` và workflow EAS. Nút build mặc định bị khóa cho đến khi chủ sở hữu cấu hình và bật dịch vụ; không có APK/IPA giả. Thanh toán Stripe/PayOS chưa được kết nối.
 
-## Tạo Supabase riêng
+## Cơ sở dữ liệu
 
-Dùng một dự án Supabase riêng cho nền tảng này. **Không chạy schema lên database của Góc Hợp Âm.** Kiểm tra hạn mức của nhà cung cấp trước khi bật dịch vụ; mã này không tự tạo hay tính phí tài khoản.
+Với dự án Supabase mới, chạy `supabase/schema.sql`. Với cơ sở dữ liệu NPT Duy Studio đã có Phase 1, chạy riêng `supabase/migrations/20261114_builder.sql`; migration này bổ sung bảng, hàm và cột, không xóa dữ liệu hiện có. Không chạy lên cơ sở dữ liệu Góc Hợp Âm.
 
-1. Mở SQL Editor và chạy toàn bộ `supabase/schema.sql` trên database mới.
-2. Trong Authentication → Users, tạo tài khoản Founder và xác thực email theo cài đặt của dự án.
-3. Trong SQL Editor, thay email bên dưới bằng email của Founder, rồi chạy:
+Trong Authentication → URL Configuration, đặt Site URL về địa chỉ HTTPS chính thức và thêm chính xác `<URL website>/auth/confirm` vào Redirect URLs. Cấu hình `NEXT_PUBLIC_SITE_URL` giống địa chỉ này. Mẫu email mặc định của Supabase được giữ nguyên. Dùng cùng trình duyệt để yêu cầu và mở liên kết xác nhận hoặc khôi phục vì luồng PKCE lưu mã xác minh trong trình duyệt ban đầu. Dịch vụ email mặc định của Supabase có giới hạn người nhận; cần cấu hình SMTP phù hợp trước khi mở đăng ký rộng rãi.
 
-```sql
-update public.profiles
-set role = 'admin'
-where id = (select id from auth.users where email = 'FOUNDER@example.com');
+Chỉ cấp quyền Founder cho tài khoản được chủ sở hữu chỉ định trong SQL Editor hoặc backend tin cậy. Không lưu mật khẩu, service-role key hay token vào GitHub.
 
-select p.id, p.email, p.role
-from public.profiles p
-where p.id = (select id from auth.users where email = 'FOUNDER@example.com');
-```
+## Build APK/IPA
 
-Kết quả cần có một dòng với `role = admin`. Quản lý mật khẩu trong Supabase Auth; không lưu mật khẩu, service-role key hay token vào GitHub. Tài khoản người dùng không thể tự nâng quyền admin hoặc thay đổi gói qua Data API.
+Workflow `.github/workflows/build-app.yml` nhận một `build_jobs.id`, lấy bản chụp giao diện đã lưu, gửi mã đã tạo tới Expo EAS, rồi lưu file thành công vào R2 riêng tư. Link tải được ký và chỉ cấp sau khi kiểm tra quyền sở hữu. Đây là tích hợp cần cấu hình, không phải bằng chứng đã build thành công.
 
-4. Kiểm tra Database → Publications → `supabase_realtime` có `public.platform_settings`, và Realtime được bật. Schema tự thêm bảng khi publication đã tồn tại.
+Trước khi bật, chủ sở hữu cần tạo cấu hình Expo EAS, chuẩn bị ký Android/iOS và một bucket R2 riêng tư; kiểm tra hạn mức và chi phí trước khi sử dụng. Trên GitHub Actions, cấu hình secrets: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `EXPO_TOKEN`, `EAS_PROJECT_ID`, `EAS_OWNER`, `EAS_PROJECT_SLUG`, `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`. Thiết lập Expo project và signing phù hợp với từng ứng dụng trước khi dùng thực tế. IPA thiết bị cần thông tin ký Apple hợp lệ.
 
-## Chạy tại máy
+Trên Sites, cấu hình riêng các biến bảo mật `BUILD_DISPATCH_TOKEN`, `BUILD_WORKFLOW_REPOSITORY`, `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`. Chỉ sau khi kiểm tra đầy đủ mới đặt `BUILD_PIPELINE_ENABLED=true`. Token GitHub chỉ cần quyền chạy workflow ở kho này. Các secrets chỉ đặt trong hệ thống quản lý secrets, không ghi vào mã hoặc chat. Hệ thống cần bổ sung quản lý hạn mức và chi phí theo người dùng trước khi mở build cho công chúng.
+
+## Chạy và kiểm tra
 
 ```bash
 cp .env.example .env.local
-# Điền Project URL và Publishable key (hoặc anon key) của Supabase vào .env.local.
+# Điền URL và publishable/anon key của Supabase, cùng URL website.
 npm ci
 npm run dev
+npm run typecheck
+npm run test:rls
+npm run test:builder
+npm run build
 ```
 
-Mở `http://localhost:3000/settings`, đăng nhập bằng tài khoản Founder đã tạo, đổi thông tin và nhấn Lưu. Mở trang chủ trong một thẻ khác để kiểm tra Realtime. Nếu không kết nối database hoặc chưa có cấu hình, ứng dụng sẽ báo lỗi thay vì dựng dữ liệu giả.
-
-Kiểm tra: `npm run typecheck`, `npm run test:rls`, `npm run build`. Test RLS chạy PostgreSQL PGlite cục bộ với Auth fixture; vẫn cần kiểm thử với dự án Supabase thực và trình duyệt thực.
-
-## Phân quyền
-
-- Khách đọc các giá trị cấu hình nền tảng; **không lưu bí mật hay thông tin riêng trong `platform_settings`**.
-- User chỉ được truy cập project/page mình sở hữu. `profiles.role` và `subscription_plan` không thể thay đổi trực tiếp từ client.
-- Cập nhật settings là một transaction; RLS bảo vệ ngay cả khi gọi database trực tiếp. Chỉ SQL Editor hoặc backend tin cậy mới được cấp quyền Founder.
-- Giá trị mặc định trong `schema.sql` là cấu hình ban đầu lưu trong database, không phải dữ liệu giả trong component. Cờ AI chỉ là cấu hình và không kích hoạt dịch vụ AI nào.
+Khi triển khai Sites, cung cấp `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` và `NEXT_PUBLIC_SITE_URL` cho cả quá trình build lẫn runtime. Không dùng service-role key làm khóa công khai. Kiểm thử cục bộ không thay thế việc đăng nhập, kéo thả, lưu và build thật sau khi cấu hình dịch vụ.

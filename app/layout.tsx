@@ -14,7 +14,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     const supabase = await createClient();
     const { data, error } = await supabase.from("platform_settings").select("key,value,updated_at").in("key", [...SETTING_KEYS]);
     if (!error && data) rows = data as SettingRow[];
-  } catch {
+    else if (error) console.error("[platform-settings] query failed", { code: error.code, message: error.message });
+  } catch (error) {
+    console.error("[platform-settings] connection failed", error instanceof Error ? error.message : "unknown error");
     // The provider displays a clear setup/connection message; it never fabricates settings.
   }
   const settings = parseSettings(rows);

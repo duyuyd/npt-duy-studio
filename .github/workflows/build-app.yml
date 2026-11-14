@@ -1,0 +1,54 @@
+name: Build user app
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: Queued build job ID
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      JOB_ID: ${{ inputs.job_id }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_PROJECT_ID: ${{ secrets.EAS_PROJECT_ID }}
+      EAS_OWNER: ${{ secrets.EAS_OWNER }}
+      EAS_PROJECT_SLUG: ${{ secrets.EAS_PROJECT_SLUG }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      GENERATOR_BUNDLE: ${{ runner.temp }}/npt-build-support.mjs
+      EAS_NO_VCS: 1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx esbuild scripts/build-support.ts --bundle --platform=node --format=esm --outfile="$GENERATOR_BUNDLE"
+      - name: Prepare saved project
+        id: prepare
+        run: node scripts/build-job.mjs prepare
+      - name: Install generated application
+        working-directory: ${{ runner.temp }}/npt-app
+        run: npm install --no-audit --no-fund
+      - name: Build with Expo EAS
+        working-directory: ${{ runner.temp }}/npt-app
+        env:
+          PLATFORM: ${{ steps.prepare.outputs.platform }}
+        run: npx --yes eas-cli@27.10.0 build --platform "$PLATFORM" --profile preview --non-interactive --wait --json > "$RUNNER_TEMP/eas-result.json"
+      - name: Store private artifact and finish
+        run: node scripts/build-job.mjs complete
+      - name: Record failure
+        if: ${{ failure() && steps.prepare.outputs.claimed == 'true' }}
+        run: node scripts/build-job.mjs fail

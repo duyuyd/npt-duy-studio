@@ -1,9 +1,10 @@
-export const SETTING_KEYS = ["primary_color", "hero_title", "enable_ai_build"] as const;
+export const SETTING_KEYS = ["primary_color", "hero_title", "hero_subtitle", "enable_ai_build"] as const;
 export type SettingKey = typeof SETTING_KEYS[number];
 export type SettingRow = { key: string; value: unknown; updated_at: string };
 export type PlatformSettings = {
   primary_color: string;
   hero_title: string;
+  hero_subtitle: string;
   enable_ai_build: boolean;
 };
 
@@ -13,6 +14,8 @@ export function parseSettings(rows: SettingRow[]): PlatformSettings | null {
     typeof settings.primary_color !== "string" || !/^#[0-9a-fA-F]{6}$/.test(settings.primary_color) ||
     typeof settings.hero_title !== "string" || settings.hero_title.trim().length < 1 ||
     Array.from(settings.hero_title.trim()).length > 160 ||
+    typeof settings.hero_subtitle !== "string" || settings.hero_subtitle.trim().length < 1 ||
+    Array.from(settings.hero_subtitle.trim()).length > 500 ||
     typeof settings.enable_ai_build !== "boolean"
   ) return null;
   return settings as PlatformSettings;

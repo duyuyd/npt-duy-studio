@@ -37,11 +37,13 @@ export function SettingsForm({ email }: { email: string }) {
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const hero = draft.hero_title.trim();
+    const subtitle = draft.hero_subtitle.trim();
     if (!/^#[0-9a-fA-F]{6}$/.test(draft.primary_color)) { setError("Màu cần có dạng #RRGGBB."); return; }
     if (hero.length < 1 || Array.from(hero).length > 160) { setError("Tiêu đề cần từ 1 đến 160 ký tự."); return; }
+    if (!subtitle || Array.from(subtitle).length > 500) { setError("Mô tả cần từ 1 đến 500 ký tự."); return; }
     setBusy(true); setError(""); setNotice("");
     try {
-      const result = await savePlatformSettings({ ...draft, hero_title: hero });
+      const result = await savePlatformSettings({ ...draft, hero_title: hero, hero_subtitle: subtitle });
       const saved = result.ok ? parseSettings(result.rows as SettingRow[]) : null;
       if (!result.ok || !saved) {
         setError(result.ok ? "Cấu hình trả về không hợp lệ." : result.error);
@@ -68,6 +70,7 @@ export function SettingsForm({ email }: { email: string }) {
       <form onSubmit={save} className="settings-card"><div className="card-heading"><div><p className="overline">01 / GIAO DIỆN</p><h2>Nhận diện nền tảng</h2><p className="muted">Thay đổi sẽ được lưu vào cấu hình chung.</p></div><span className="card-icon">✳</span></div>
         <div className="setting-block"><div><label className="setting-label" htmlFor="primary-color-text">Màu chủ đạo</label><p className="setting-help">Áp dụng cho các điểm nhấn và nút trên toàn bộ giao diện.</p></div><div className="color-control"><label className="color-picker" aria-label="Chọn màu chủ đạo"><input type="color" value={validColor ? draft.primary_color : settings.primary_color} onChange={(event) => edit("primary_color", event.target.value)} /></label><input id="primary-color-text" className="color-text" value={draft.primary_color} onChange={(event) => edit("primary_color", event.target.value)} spellCheck={false} maxLength={7} aria-describedby="color-hint" /><span id="color-hint">HEX</span></div></div>
         <div className="setting-block"><div><label className="setting-label" htmlFor="hero-title">Tiêu đề trang chủ</label><p className="setting-help">Lời đầu tiên khách nhìn thấy khi đến nền tảng.</p></div><textarea id="hero-title" className="field-input hero-input" rows={3} maxLength={160} value={draft.hero_title} onChange={(event) => edit("hero_title", event.target.value)} required /><div className="char-count">{draft.hero_title.length} / 160</div></div>
+        <div className="setting-block"><label className="setting-label" htmlFor="hero-subtitle">Mô tả trang chủ</label><textarea id="hero-subtitle" className="field-input hero-input" rows={3} maxLength={500} value={draft.hero_subtitle} onChange={(event) => edit("hero_subtitle", event.target.value)} required /><div className="char-count">{draft.hero_subtitle.length} / 500</div></div>
         <div className="setting-block flag-block"><div><label id="ai-label" className="setting-label">Cấu hình tạo bằng AI</label><p className="setting-help">Lưu cờ bật/tắt cho giai đoạn sau. Chức năng AI chưa được triển khai.</p></div><button type="button" role="switch" aria-checked={draft.enable_ai_build} aria-labelledby="ai-label" onClick={() => edit("enable_ai_build", !draft.enable_ai_build)} className={`switch ${draft.enable_ai_build ? "is-on" : ""}`}><span /></button></div>
         {remoteChange && <p className="banner">Cấu hình đã thay đổi ở một phiên khác. Bản bạn đang sửa vẫn được giữ; lưu sẽ ghi đè các trường trên.</p>}
         {error && <p role="alert" className="form-error">{error}</p>}{notice && <p role="status" className="form-success">{notice}</p>}
