@@ -1,4 +1,4 @@
-# NPT Duy Studio
+# NuvoraCraft
 
 Nền tảng tạo website và ứng dụng của NPT Duy. Dự án dùng Next.js 15, React 19, Supabase, Tailwind 4 và @dnd-kit; tách biệt với Góc Hợp Âm.
 
@@ -12,7 +12,7 @@ Nền tảng tạo website và ứng dụng của NPT Duy. Dự án dùng Next.j
 
 ## Cơ sở dữ liệu
 
-Với dự án Supabase mới, chạy `supabase/schema.sql`. Với cơ sở dữ liệu NPT Duy Studio đã có Phase 1, chạy riêng `supabase/migrations/20261114_builder.sql`; migration này bổ sung bảng, hàm và cột, không xóa dữ liệu hiện có. Không chạy lên cơ sở dữ liệu Góc Hợp Âm.
+Với dự án Supabase mới, chạy `supabase/schema.sql`. Với cơ sở dữ liệu NuvoraCraft đã có Phase 1, chạy riêng `supabase/migrations/20261114_builder.sql`; migration này bổ sung bảng, hàm và cột, không xóa dữ liệu hiện có. Không chạy lên cơ sở dữ liệu Góc Hợp Âm.
 
 Trong Authentication → URL Configuration, đặt Site URL về địa chỉ HTTPS chính thức và thêm chính xác `<URL website>/auth/confirm` vào Redirect URLs. Cấu hình `NEXT_PUBLIC_SITE_URL` giống địa chỉ này. Mẫu email mặc định của Supabase được giữ nguyên. Dùng cùng trình duyệt để yêu cầu và mở liên kết xác nhận hoặc khôi phục vì luồng PKCE lưu mã xác minh trong trình duyệt ban đầu. Dịch vụ email mặc định của Supabase có giới hạn người nhận; cần cấu hình SMTP phù hợp trước khi mở đăng ký rộng rãi.
 

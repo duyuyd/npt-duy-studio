@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "NPT Duy Studio", description: "Không gian tạo sản phẩm số." };
+export const metadata: Metadata = { title: "NuvoraCraft", description: "Không gian tạo sản phẩm số." };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   let rows: SettingRow[] = [];
