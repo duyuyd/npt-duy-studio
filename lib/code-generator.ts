@@ -36,11 +36,11 @@ export function exportToReact(tree: UiTree, target: ExportTarget, projectId: str
   if (target === "web") return {
     "package.json": JSON.stringify({ name: "studio-export-web", private: true, version: "1.0.0", type: "module", scripts: { dev: "vite", build: "vite build", preview: "vite preview" }, dependencies: { react: "19.2.9", "react-dom": "19.2.9" }, devDependencies: { "@vitejs/plugin-react": "6.3.0", vite: "8.3.8" } }, null, 2),
     "vite.config.js": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nexport default defineConfig({ plugins: [react()] });\n",
-    "index.html": '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NPT Duy Studio</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>',
+    "index.html": '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NuvoraCraft</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>',
     "src/main.jsx": "import React from 'react';\nimport { createRoot } from 'react-dom/client';\nimport App from './App.jsx';\ncreateRoot(document.getElementById('root')).render(<App />);\n",
     "src/App.jsx": webApp, "src/tree.json": source,
     "src/style.css": "*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}main{min-height:100vh}p{margin:0;white-space:pre-wrap}a{display:inline-block;text-decoration:none}button{cursor:pointer}\n",
-    "README.md": "# Website xuất từ NPT Duy Studio\n\nChạy `npm install` rồi `npm run dev`; dùng `npm run build` để tạo bản web. Đường dẫn ảnh tương đối cần được bổ sung vào thư mục public.\n"
+    "README.md": "# Website xuất từ NuvoraCraft\n\nChạy `npm install` rồi `npm run dev`; dùng `npm run build` để tạo bản web. Đường dẫn ảnh tương đối cần được bổ sung vào thư mục public.\n"
   };
   const invalid: string[] = [];
   const inspect = (nodes: BuilderNode[]) => nodes.forEach(node => {
@@ -56,6 +56,6 @@ export function exportToReact(tree: UiTree, target: ExportTarget, projectId: str
     "app.json": JSON.stringify({ expo: { name: projectName, slug: `npt-${suffix}`, version: "1.0.0", orientation: "default", android: { package: `com.nptduystudio.app${suffix}` }, ios: { bundleIdentifier: `com.nptduystudio.app${suffix}`, supportsTablet: true } } }, null, 2),
     "eas.json": JSON.stringify({ cli: { version: ">= 27.10.0", appVersionSource: "remote" }, build: { preview: { android: { buildType: "apk" }, ios: { simulator: false } } } }, null, 2),
     "App.js": nativeApp, "tree.json": source,
-    "README.md": "# Ứng dụng xuất từ NPT Duy Studio\n\nChạy `npm install` rồi `npx expo start`. Muốn tạo APK/IPA cần dự án Expo EAS và thông tin ký ứng dụng phù hợp.\n"
+    "README.md": "# Ứng dụng xuất từ NuvoraCraft\n\nChạy `npm install` rồi `npx expo start`. Muốn tạo APK/IPA cần dự án Expo EAS và thông tin ký ứng dụng phù hợp.\n"
   };
 }
