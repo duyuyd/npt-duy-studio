@@ -29,3 +29,19 @@ for(const path of tracked){
  }catch(error){console.error("Skipped unreadable file",path,error.message)}
 }
 console.log("Tracked source/doc files updated:",count);
+
+
+// Package rename is coordinated with npm lockfile root metadata to preserve npm ci.
+const oldName = ["npt-duy", "-no-code-studio"].join("");
+for (const file of ["package.json", "package-lock.json"]) {
+ try {
+  const obj = JSON.parse(readFileSync(file, "utf8"));
+  let changed = false;
+  if (obj.name === oldName) { obj.name = "nuvoracraft"; changed = true; }
+  if (obj.packages?.[""]?.name === oldName) { obj.packages[""].name = "nuvoracraft"; changed = true; }
+  if (changed) {
+   writeFileSync(file, JSON.stringify(obj, null, 2) + "\n");
+   console.log("Updated package identity:", file);
+  }
+ } catch (error) { console.error("Package identity update failed:",file,error.message); process.exitCode=1; }
+}
