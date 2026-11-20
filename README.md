@@ -40,3 +40,7 @@ npm run build
 ```
 
 Khi triển khai Sites, cung cấp `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` và `NEXT_PUBLIC_SITE_URL` cho cả quá trình build lẫn runtime. Không dùng service-role key làm khóa công khai. Kiểm thử cục bộ không thay thế việc đăng nhập, kéo thả, lưu và build thật sau khi cấu hình dịch vụ.
+
+## NuvoraCraft brand / Capacitor APK on feature branch
+
+This older independent Next.js prototype is branded as part of NuvoraCraft, but it **does not share the production SaaS deployment** automatically. Puter.js is loaded after hydration; it is not an API key nor a promise of free unlimited AI. The Capacitor workflow uses a remote **HTTPS website** and only builds after the repository variable `APK_WEB_URL` is configured to this prototype's real deployment. Without a real URL it does not manufacture a working APK. Existing Supabase data and build pipelines are left unchanged. PR is held for Founder `VERIFIED` before merge.

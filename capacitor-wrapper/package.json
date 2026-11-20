@@ -1,0 +1,14 @@
+{
+  "name": "nuvoracraft-studio-hybrid",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@capacitor/core": "8.6.2",
+    "@capacitor/android": "8.6.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.2",
+    "typescript": "^5.9.3"
+  }
+}

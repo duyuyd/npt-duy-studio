@@ -1,3 +1,4 @@
+import Script from "next/script";
 import type { Metadata } from "next";
 import { PlatformProvider } from "@/lib/platform/PlatformProvider";
 import { SETTING_KEYS, parseSettings, type SettingRow } from "@/lib/platform/settings";
@@ -20,5 +21,5 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     // The provider displays a clear setup/connection message; it never fabricates settings.
   }
   const settings = parseSettings(rows);
-  return <html lang="vi" style={settings ? themeStyle(settings.primary_color) : undefined}><body><PlatformProvider initialRows={rows}>{children}</PlatformProvider></body></html>;
+  return <html lang="vi" style={settings ? themeStyle(settings.primary_color) : undefined}><body><PlatformProvider initialRows={rows}>{children}</PlatformProvider><Script src="https://js.puter.com/v2/" strategy="afterInteractive"/></body></html>;
 }
